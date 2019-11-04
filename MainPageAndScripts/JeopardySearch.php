@@ -103,23 +103,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src='./API_Requests.js'></script>
 <script src='./Detailed_View_Popup'></script>
-<script>
-
-document.getElementById("date_of_questions").addEventListener("change", unhideTypeOfDate, false); // Bind the hiding call to data change
-
-
-//Hide or unhide the type_of_date field depending on whether the user has a date selected or not
-function unhideTypeOfDate() {
-    const date = document.getElementById("date_of_questions").value;
-    if(date == "") {
-        document.getElementById("type_of_date").style.display = 'none';
-    }
-    else {
-        document.getElementById("type_of_date").style.display = 'inline-block';
-    }
-}
-
-</script>
+<script src='./Hide_And_Unhide_Date_Type.js'></script>
 
 
 </footer>
