@@ -3,6 +3,36 @@ body {
     color: darkslategrey;
 }
 
+.main_title {
+    text-align: center;
+}
+
+.search_fields {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /* border-style: solid;
+    border-color: whitesmoke; */
+}
+
+.search_field_group {
+    padding: 3px 20px;
+}
+
+.next_and_previous_buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 10px;
+}
+
+#search_previous_page {
+    align-content: left;
+}
+
+#search_next_page {
+    /* align-content: right; */
+}
 
 table.search_results_table {
     border: 3px solid black;
@@ -37,20 +67,7 @@ th.answer {
 }
 
 
-.generic_label {
-    color: whitesmoke;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.detailed_view_data {
-    background: whitesmoke;
-    color: darkslategrey;
-    padding: 10px 10px;
-}
-
-
-/*Used this source as inspiration for the popup CSS*/
+/*Used this source as heavy inspiration for the popup CSS*/
 /*https://www.codexworld.com/simple-modal-popup-javascript-css/ */
 /* mPopup box style */
 .popup {
@@ -86,11 +103,11 @@ th.answer {
     color: whitesmoke;
 }
 .popup_main {padding: 2px 16px;}
-/* .mpopup-foot {
+.popup_foot {
     padding: 2px 16px;
     background-color: darkslategrey;
     color: whitesmoke;
-} */
+}
 
 /* add animation effects */
 @-webkit-keyframes animatetop {
@@ -110,19 +127,25 @@ th.answer {
     font-size: 28px;
     font-weight: bold;
 }
+
 .close:hover, .close:focus {
     color: red;
     text-decoration: none;
     cursor: pointer;
 }
 
-
-
-
-/* th.what_is {
-    width: 50%;
+.generic_label {
+    color: whitesmoke;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-th.answer {
-    width: 50%;
-} */
+.detailed_view_data {
+    background: whitesmoke;
+    color: darkslategrey;
+    padding: 10px 10px;
+}
+
+
+
+
