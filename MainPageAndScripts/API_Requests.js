@@ -2,10 +2,11 @@
 document.getElementById("search_submit").addEventListener("click", newSearch, false); // Bind the AJAX call to button click
 document.getElementById("search_next_page").addEventListener("click", nextPage, false); // Bind the AJAX call to button click
 document.getElementById("search_previous_page").addEventListener("click", previousPage, false); // Bind the AJAX call to button click
-// document.getElementById("category_search_submit").addEventListener("click", APIAjaxCategory, false); // Bind the AJAX call to button click
 
-
-
+let value = document.getElementById("value_of_questions").value; // Get the value from the form
+let date = document.getElementById("date_of_questions").value; // Get the date from the form
+let typeOfDate = document.getElementById("type_of_date").value; // Get the type of date from the form
+let categoryID = document.getElementById("category_id").value; // Get the category id from the form
 
 //Use for pagination
 let offset = 0;
@@ -22,19 +23,8 @@ const columns = { "answer": 0, "whatIs": 1, "category": 2};
 
 //Eventually change to do on click
 function APIAjaxClues() {
-    // const text = document.getElementById("search_text").value; // Get the text from the form
-    const value = document.getElementById("value_of_questions").value; // Get the value from the form
-    const date = document.getElementById("date_of_questions").value; // Get the date from the form
-    const typeOfDate = document.getElementById("type_of_date").value; // Get the type of date from the form
-    const categoryID = document.getElementById("category_id").value; // Get the category id from the form
+    getMostRecentValues();
     let url = "https://cors-anywhere.herokuapp.com/http://jservice.io/api/clues?";
-    //Check that each item has been checked and +1 to a counter so no number of &'s.
-    //+2 for date because need to know min and max date
-    //concatenate all necessary info
-    //use get to aquire results
-
-
-    // let textQuery = "question=".concat(text).concat("&");
 
     let valueQuery = "value=";
     if(value != "no_input") {
@@ -42,9 +32,35 @@ function APIAjaxClues() {
     }
     valueQuery = valueQuery.concat("&");
 
+    let dates = getMinAndMaxDates(date);
+
+    let minDate = dates[0];
+    let maxDate = dates[1];
+
+
+    let categoryIDQuery = "category=".concat(categoryID).concat("&");
+
+    const offsetQuery = "offset=".concat(offset);
+
+    //final url to make a call to
+    url = url.concat(valueQuery).concat(minDate).concat(maxDate).concat(categoryIDQuery).concat(offsetQuery);
+    console.log(url);
+
+    //update table based on url
+    updateTable(url);
+}
+
+// Get all the most recent values in the fields
+function getMostRecentValues() {
+    value = document.getElementById("value_of_questions").value;
+    date = document.getElementById("date_of_questions").value; 
+    typeOfDate = document.getElementById("type_of_date").value; 
+    categoryID = document.getElementById("category_id").value;
+}
+
+function getMinAndMaxDates(date) {
     let minDate = "min_date=";
     let maxDate = "max_date=";
-
     //Date always in formate yyyy-mm-dd
     //Create date object for easy retrieval of month and year
     let jsDate = new Date(date);
@@ -70,17 +86,37 @@ function APIAjaxClues() {
     }
     minDate = minDate.concat("&");
     maxDate = maxDate.concat("&");
+    return [minDate, maxDate];
+}
 
 
+//Calculates which is the correct last day for the month being searched
+function calculateLastDayInMonth(dateObject) {
+    //default to 31 and change if necessary
+    let lastDay = 31;
+    switch(dateObject.getMonth()) {
+        case monthsNot31.april:
+        case monthsNot31.june:
+        case monthsNot31.september:
+        case monthsNot31.november:
+            lastDay = 30
+            break;
+        case monthsNot31.february:
+            //leap day
+            if(dateObject.getFullYear % 4) {
+                lastDay = 29;
+            }
+            else {
+                lastDay = 28;
+            }
+            break;
+    }
+    return lastDay;
+}
 
-    let categoryIDQuery = "category=".concat(categoryID).concat("&");
 
-    const offsetQuery = "offset=".concat(offset);
-
-    url = url.concat(valueQuery).concat(minDate).concat(maxDate).concat(categoryIDQuery).concat(offsetQuery);
-    console.log(url);
-
-
+//Updates Table with responses from api url
+function updateTable(url) {
     $.get(url, {}, function(response) {
         //only add and delete from the body
         let table = document.getElementById("search_results_table").getElementsByTagName('tbody')[0];
@@ -118,70 +154,67 @@ function APIAjaxClues() {
         //Account for header (and dummy value) by starting at 1 and going 1 more than length (exclusive bound) 
         for(i = 0; i < response.length; i += 1) {
             currentResult = response[i];
+            //add corresponding json to results for future reference
             results.push(currentResult);
-            console.log(results[i]);
             //For questions that have invalid elements (the api says this could be due to audio or video questions)
             if(currentResult.question == "" || value == null) {
                 continue;
             }
-            let row = table.insertRow(table.rows.length);
-            //store the id as the associated index in the array for access when selected
-            row.id = i;
-            let cell0 = row.insertCell(columns.answer);
-            let cell1 = row.insertCell(columns.whatIs);
-            let cell2 = row.insertCell(columns.category);
-            cell0.innerHTML = currentResult.question;
-            cell1.innerHTML = currentResult.answer;
-            cell2.innerHTML = currentResult.category.title;
+            insertCorrespondingRow(currentResult, table, i);
+
             //Make sure all the results are loaded so only one listener is made.
             //Creates the popup for the selected item
             if(i == response.length - 1) {
-                $( "tr" ).click(function() {
-                    //Use this if statement to exclude the header since it is technically a row
-                    if( $(this).attr("id")) {
-                        let currentIndex = $( this ).attr("id");
-                        detailedViewPopup.style.display = "block";
-                        document.getElementById("detailed_view_question").innerHTML = results[currentIndex].question;
-                        document.getElementById("detailed_view_what_is").innerHTML = results[currentIndex].answer;
-                        document.getElementById("detailed_view_value").innerHTML = results[currentIndex].value;
-                        document.getElementById("detailed_view_category").innerHTML = results[currentIndex].category.title;
-                        document.getElementById("detailed_view_category_id").innerHTML = results[currentIndex].category.id;
-                        //Get substring to cut off weird time related stuff at the end (aka formats to yyyy-mm-dd)
-                        document.getElementById("detailed_view_airdate").innerHTML = results[currentIndex].airdate.substring(0,10);
-                    }
-                })
+                addRowEventListener(results);
             }
 
         }
     })
-
 }
 
-function calculateLastDayInMonth(dateObject) {
-    //default to 31 and change if necessary
-    let lastDay = 31;
-    switch(dateObject.getMonth()) {
-        case monthsNot31.april:
-        case monthsNot31.june:
-        case monthsNot31.september:
-        case monthsNot31.november:
-            lastDay = 30
-            break;
-        case monthsNot31.february:
-            //leap day
-            if(dateObject.getFullYear % 4) {
-                lastDay = 29;
+
+//Inserts a row with the corresponding cells to the current api response
+function insertCorrespondingRow(currentResult, table, i) {
+    let row = table.insertRow(table.rows.length);
+    //store the id as the associated index in the array for access when selected
+    row.id = i;
+    let cell0 = row.insertCell(columns.answer);
+    let cell1 = row.insertCell(columns.whatIs);
+    let cell2 = row.insertCell(columns.category);
+    cell0.innerHTML = currentResult.question;
+    cell1.innerHTML = currentResult.answer;
+    //Some values don't have categories stored with them (try searching all year for 2009)
+    if(typeof(currentResult.category) != 'undefined' && currentResult.category.title != null) {
+        cell2.innerHTML = currentResult.category.title;
+    }
+    else {
+        cell2.innerHTML = "No category title stored with this question";
+    }
+}
+
+
+//Adds a listener at the end so clicking on a row will pull up a popup with more details
+function addRowEventListener(results) {
+    $( "tr" ).click(function() {
+        //Use this if statement to exclude the header since it is technically a row
+        if( $(this).attr("id")) {
+            let currentIndex = $( this ).attr("id");
+            detailedViewPopup.style.display = "block";
+            document.getElementById("detailed_view_question").innerHTML = results[currentIndex].question;
+            document.getElementById("detailed_view_what_is").innerHTML = results[currentIndex].answer;
+            document.getElementById("detailed_view_value").innerHTML = results[currentIndex].value;
+            if(typeof(results[currentIndex].category) != 'undefined' && results[currentIndex].category.title != null) {
+                document.getElementById("detailed_view_category").innerHTML = results[currentIndex].category.title;
             }
             else {
-                lastDay = 28;
+                document.getElementById("detailed_view_category").innerHTML = "No category title stored with this question";
             }
-            break;
-    }
-    return lastDay;
+            document.getElementById("detailed_view_category_id").innerHTML = results[currentIndex].category_id;
+            //Get substring to cut off weird time related stuff at the end (aka formats to yyyy-mm-dd)
+            document.getElementById("detailed_view_airdate").innerHTML = results[currentIndex].airdate.substring(0,10);
+        }
+    })
 }
-
-
-
 
 function nextPage() {
     if(haveSearched) {

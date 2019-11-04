@@ -87,9 +87,9 @@
             <label class="generic_label">Airdate: </label>
             <p class="detailed_view_data" id="detailed_view_airdate"></p><br>
         </div>
-        <div class="popup_foot">
-            <p>Select a "Search This" button to restrict the results to that category</p>
-        </div>
+        <!-- <div class="popup_foot">
+            <p>Here is the associated data with your selection</p>
+        </div> -->
     </div>
 </div>
 

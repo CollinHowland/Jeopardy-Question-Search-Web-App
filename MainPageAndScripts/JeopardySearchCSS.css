@@ -74,7 +74,7 @@ th.answer {
     display: none;
     position: fixed;
     z-index: 1;
-    padding-top: 100px;
+    padding-top: 75px;
     left: 0;
     top: 0;
     width: 100%;
@@ -103,11 +103,11 @@ th.answer {
     color: whitesmoke;
 }
 .popup_main {padding: 2px 16px;}
-.popup_foot {
+/* .popup_foot {
     padding: 2px 16px;
     background-color: darkslategrey;
     color: whitesmoke;
-}
+} */
 
 /* add animation effects */
 @-webkit-keyframes animatetop {
