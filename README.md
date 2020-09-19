@@ -4,8 +4,7 @@ This is a project that was made in response to Capital One's MindSumo challenge
 The challenge can be found here:
 https://www.mindsumo.com/contests/jeopardy-api
 
-Working copy at:
-http://ec2-18-219-218-157.us-east-2.compute.amazonaws.com/~collinH/jeopardy/JeopardySearch.php
+EC2 Instance shutdown. No longer have a running instance, so expired link removed.
 
 This project uses HTML, CSS, JavaScript, and PHP. It mostly uses JavaScript to allow for updates to be made to the page asynchronously so that the user does not have to refresh the page or have the interface lock up.
 
